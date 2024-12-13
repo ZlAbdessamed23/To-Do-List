@@ -1,19 +1,20 @@
-import { revalidate, useNavigate, useSearchParams } from "@solidjs/router";
+import { useNavigate, useSearchParams } from "@solidjs/router";
 import { changeStatus, deleteTaskById, getTaskById } from "../utils/funcs";
 import { Task, TaskType, RepetetiveTask, DeadlineTask, SpeceficTimeTask } from "../types/types";
+import UpdateTaskModal from "../components/UpdateTaskModal";
+import { createSignal } from "solid-js";
 
 const ToDoDisplay = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const taskId = searchParams.id;
     const taskType = searchParams.type as TaskType;
+    const [isOpen, setIsOpen] = createSignal(false);
     const task = taskId ? getTaskById(taskId as string) : undefined;
 
     const isDeadlineTask = (task: Task): task is DeadlineTask => task.type === "with-deadline";
     const isSpecificTimeTask = (task: Task): task is SpeceficTimeTask => task.type === "with-specefic-time";
     const isRepetetiveTask = (task: Task): task is RepetetiveTask => task.type === "repetetive";
-
-   
 
     function handleDelete() {
         deleteTaskById(task?.id as string);
@@ -23,6 +24,10 @@ const ToDoDisplay = () => {
     function handleChangeStatus() {
         changeStatus(task?.id as string);
         window.location.reload();
+    };
+
+    function handleUpdate() {
+        setIsOpen(true);
     };
 
     if (!task || task.type !== taskType) {
@@ -35,7 +40,7 @@ const ToDoDisplay = () => {
                 </div>
             </div>
         );
-    }
+    };
 
     return (
         <div class="h-screen w-screen pt-10">
@@ -100,7 +105,8 @@ const ToDoDisplay = () => {
                 <div class="mt-6 flex gap-4 justify-end">
                     <button class="btn btn-error" onclick={handleDelete}>Delete</button>
                     <button class="btn bg-secondary-content text-black hover:btn-info" onclick={handleChangeStatus}>Change Status</button>
-                    <button class="btn btn-secondary">Update</button>
+                    <button class="btn btn-secondary" onclick={handleUpdate}>Update</button>
+                    <UpdateTaskModal isModalOpen={isOpen} setModalOpen={setIsOpen} task={task} />
                 </div>
             </div>
         </div>

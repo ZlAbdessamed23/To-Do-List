@@ -52,3 +52,11 @@ export function changeStatus(taskId: string): void {
     );
     saveTasks(updatedTasks);
 }
+
+export function updateTask(updatedTask: Task): void {
+    const tasks = getStoredTasks();
+    const updatedTasks = tasks.map(task => 
+        task.id === updatedTask.id ? updatedTask : task
+    );
+    saveTasks(updatedTasks);
+}
